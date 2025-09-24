@@ -1,0 +1,13 @@
+#```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: brain-tasks-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: brain-tasks
+#```
