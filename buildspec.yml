@@ -15,12 +15,21 @@ phases:
       - echo Build started...
       - docker build -t $IMAGE_REPO_NAME .
       - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
-  post_build:
-    commands:
-      - echo Pushing to ECR...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
-      - printf '[{"name":"brain-tasks","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest > imagedefinitions.json
-      - echo Deploying to EKS...
-      - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_DEFAULT_REGION
-      - kubectl apply -f deployment.yaml
-      - kubectl apply -f service.yaml
+ # post_build:
+   # commands:
+    #  - echo Pushing to ECR...
+     # - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      #- printf '[{"name":"brain-tasks","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest > imagedefinitions.json
+     # - echo Deploying to EKS...
+     # - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_DEFAULT_REGION
+     # - kubectl apply -f deployment.yaml
+     # - kubectl apply -f service.yaml
+post_build:
+  commands:
+    - echo Pushing to ECR...
+    - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+    - printf '[{"name":"brain-tasks","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest > imagedefinitions.json
+    - echo Deploying to EKS...
+    - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_DEFAULT_REGION --role-arn arn:aws:iam::342137541267:role/codebuild-brain-tasks-build-service-role
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
