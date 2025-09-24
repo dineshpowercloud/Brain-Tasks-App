@@ -1,11 +1,10 @@
-
-    version: 0.2
+version: 0.2
     phases:
       install:
         commands:
           - echo Installing dependencies...
-          - sudo apt-get update
-          - sudo apt-get install -y kubectl
+          - apt-get update
+          - apt-get install -y kubectl
       pre_build:
         commands:
           - echo Logging in to Amazon ECR...
@@ -24,4 +23,3 @@
           - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_DEFAULT_REGION
           - kubectl apply -f deployment.yaml
           - kubectl apply -f service.yaml
-    
