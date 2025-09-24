@@ -1,11 +1,13 @@
 version: 0.2
 phases:
+  install:
+    commands:
+      - echo Installing kubectl...
+      - yum install -y kubectl
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - echo Installing kubectl...
-      - yum install -y kubectl  # Install kubectl in the build environment
   build:
     commands:
       - echo Build started...
@@ -16,8 +18,6 @@ phases:
       - echo Pushing to ECR...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
       - printf '[{"name":"brain-tasks","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest > imagedefinitions.json
-  deploy:
-    commands:
       - echo Deploying to EKS...
       - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_DEFAULT_REGION
       - kubectl apply -f deployment.yaml
